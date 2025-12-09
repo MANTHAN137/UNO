@@ -284,27 +284,41 @@ io.on('connection', (socket) => {
         const attacker = game.players[attackerIdx];
         const victim = game.players[victimIdx];
 
+        game.pendingWildDraw4 = null; // Clear state first
+
         if (challenge) {
             let hasColor = attacker.hand.some(c => c.color === prevColor);
             if (hasColor) {
                 // Succeeded: Attacker draws 4, Victim turns safely
                 attacker.hand.push(...game.drawCards(4));
                 io.to(currentRoom).emit('actionLog', { msg: `Challenge WON! ${attacker.name} draws 4.` });
-
-                // Victim keeps turn (play continues from victim)
                 game.turnIndex = victimIdx;
             } else {
-                // Failed: Victim draws 6, loses turn
+                // Failed: Victim draws 6
                 victim.hand.push(...game.drawCards(6));
                 io.to(currentRoom).emit('actionLog', { msg: `Challenge LOST! ${victim.name} draws 6.` });
+
+                // WIN Check: Attacker wasn't caught, they might have won
+                if (attacker.hand.length === 0) {
+                    io.to(game.roomCode).emit('gameOver', { winner: attacker.name });
+                    game.gameState = 'ended';
+                    return;
+                }
                 game.nextPlayer(2);
             }
         } else {
+            // No Challenge: Victim draws 4
             victim.hand.push(...game.drawCards(4));
+
+            // WIN Check: Attacker wasn't challenged, they might have won
+            if (attacker.hand.length === 0) {
+                io.to(game.roomCode).emit('gameOver', { winner: attacker.name });
+                game.gameState = 'ended';
+                return;
+            }
             game.nextPlayer(2);
         }
 
-        game.pendingWildDraw4 = null;
         updateGameAll(game);
     });
 
@@ -357,28 +371,23 @@ io.on('connection', (socket) => {
             }
 
             let nextStep = 1;
-            if (card.value === 'wild_draw4') {
-                // Simplified: No challenge on drawn Wild Draw 4 for now to keep flow steady, or same logic?
-                // Let's allow simple flow: No challenge logic on instant replay for simplicity, 
-                // OR apply same logic. 'playCard' logic is better re-used.
-                // For safety/time, I'll treat it as standard play without challenge (or auto-pass challenge).
-                // Actually, let's just make it behave like normal specials
-                if (card.value === 'draw2') {
-                    let nextPIdx = (game.turnIndex + game.direction) % game.players.length;
-                    if (nextPIdx < 0) nextPIdx += game.players.length;
-                    game.players[nextPIdx].hand.push(...game.drawCards(2));
-                    nextStep = 2;
-                } else if (card.value === 'skip') nextStep = 2;
-                else if (card.value === 'reverse') {
-                    if (game.players.length === 2) nextStep = 2;
-                    else game.direction *= -1;
-                } else if (card.value === 'wild_draw4') {
-                    // Auto apply +4 to next
-                    let nextPIdx = (game.turnIndex + game.direction) % game.players.length;
-                    if (nextPIdx < 0) nextPIdx += game.players.length;
-                    game.players[nextPIdx].hand.push(...game.drawCards(4));
-                    nextStep = 2;
-                }
+            // Immediate Effect Application for Played Drawn Card
+            if (card.value === 'draw2') {
+                let nextPIdx = (game.turnIndex + game.direction) % game.players.length;
+                if (nextPIdx < 0) nextPIdx += game.players.length;
+                game.players[nextPIdx].hand.push(...game.drawCards(2));
+                nextStep = 2;
+            } else if (card.value === 'wild_draw4') {
+                // Simplified: Applied immediately without challenge for drawn cards to keep flow fast
+                let nextPIdx = (game.turnIndex + game.direction) % game.players.length;
+                if (nextPIdx < 0) nextPIdx += game.players.length;
+                game.players[nextPIdx].hand.push(...game.drawCards(4));
+                nextStep = 2;
+            } else if (card.value === 'skip') {
+                nextStep = 2;
+            } else if (card.value === 'reverse') {
+                if (game.players.length === 2) nextStep = 2;
+                else game.direction *= -1;
             }
 
             finishTurn(game, player, nextStep);

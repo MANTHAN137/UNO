@@ -39,7 +39,7 @@
             /* Strict full viewport height using dvh for mobile address bars */
             height: 100vh;
             height: 100dvh;
-            width: 100vw;
+            width: 100%;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -587,14 +587,13 @@
                 --card-h-desktop: 115px;
             }
 
-            /* Adjusted grid: More compact top, space for hand */
+            /* Adjusted grid: flexible percentages to prevent top-clinging */
             #game-layout {
-                grid-template-rows: 80px 1fr 160px;
+                grid-template-rows: 15% 55% 30%;
             }
 
-            /* Action buttons higher up to avoid edge */
             .action-anchor {
-                bottom: 150px;
+                bottom: 160px;
                 right: 15px;
             }
 
@@ -605,8 +604,8 @@
             }
 
             .opponent-avatar {
-                width: 40px;
-                height: 40px;
+                width: 45px;
+                height: 45px;
                 font-size: 16px;
             }
 
