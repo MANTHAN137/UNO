@@ -10,7 +10,7 @@
         rel="stylesheet">
     <style>
         :root {
-            /* Palette: Premium Blue Theme */
+            /* Palette: Premium Blue Theme & Gradients */
             --bg-gradient-start: #003366;
             --bg-gradient-end: #001a33;
             --surface: rgba(0, 0, 0, 0.4);
@@ -49,6 +49,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            height: 100%;
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -58,14 +59,15 @@
             opacity: 1;
         }
 
-        /* --- Components --- */
         h1,
-        h2 {
+        h2,
+        h3 {
             font-family: 'Fredoka One', cursive;
             margin: 5px 0;
             text-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
         }
 
+        /* --- Global Components --- */
         input {
             background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.2);
@@ -96,7 +98,6 @@
             font-family: 'Fredoka One', cursive;
             cursor: pointer;
             box-shadow: 0 6px 0 #d35400, 0 10px 20px rgba(0, 0, 0, 0.4);
-            transform: translateY(0);
             transition: 0.1s;
             min-width: 160px;
             text-transform: uppercase;
@@ -162,22 +163,24 @@
             }
         }
 
-        /* --- GAME LAYOUT --- */
+        /* --- GAME GRID --- */
         #game-layout {
             display: grid;
-            grid-template-rows: 100px 1fr 200px;
+            grid-template-rows: 120px 1fr 220px;
+            /* Top (Opponents), Center (Table), Bottom (Hand) */
             width: 100%;
             height: 100%;
             position: relative;
         }
 
-        /* 1. Header: Opponents */
+        /* 1. Opponent Area (Top) */
         .top-bar {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            /* Vertically Center */
             justify-content: center;
             padding-top: 10px;
-            gap: 20px;
+            gap: 40px;
         }
 
         .opponent {
@@ -187,11 +190,14 @@
             opacity: 0.6;
             transition: 0.3s;
             position: relative;
+            margin-top: 10px;
+            /* Spacing from top edge */
         }
 
         .opponent.active-turn {
             opacity: 1;
             transform: scale(1.1);
+            z-index: 10;
         }
 
         .opponent-avatar {
@@ -207,75 +213,106 @@
             font-size: 20px;
             border: 3px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            text-shadow: 1px 1px 2px black;
+            position: relative;
+            /* Anchor for badge */
         }
 
-        /* Active Glow */
         .opponent.active-turn .opponent-avatar {
             border-color: #ffd740;
-            box-shadow: 0 0 20px #ffd740;
+            box-shadow: 0 0 15px #ffd740;
         }
 
+        /* Badge Adjusted: Top Right, No Overlap */
         .opponent-card-count {
             position: absolute;
             top: -5px;
-            right: -5px;
+            right: -10px;
             background: #ff4757;
             color: white;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 12px;
-            border: 2px solid white;
+            padding: 3px 7px;
+            border-radius: 10px;
+            border: 2px solid #001a33;
+            /* Dark border to separate from circle */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            min-width: 20px;
+            text-align: center;
         }
 
         .opponent-name {
             font-size: 14px;
-            margin-top: 5px;
+            margin-top: 8px;
             text-shadow: 0 2px 4px black;
             font-weight: 700;
+            white-space: nowrap;
         }
 
-        /* 2. Status Overlay */
-        .status-overlay {
-            position: absolute;
-            top: 25%;
-            width: 100%;
+        /* 2. Center Table & Status */
+        .center-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            gap: 20px;
+            /* Space between Status and Cards */
+        }
+
+        /* Status Pill */
+        .status-pill {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
             text-align: center;
-            pointer-events: none;
-            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         #statusText {
             font-family: 'Fredoka One';
-            font-size: 40px;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
-            letter-spacing: 2px;
+            font-size: 24px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
         }
 
-        /* 3. Center Board */
-        .center-board {
+        .active-color-badge {
+            background: #444;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            display: none;
+            /* JS Toggles */
+        }
+
+        /* Card Board */
+        .card-board {
             display: flex;
-            justify-content: center;
+            gap: 40px;
+            /* Space between Draw and Discard */
             align-items: center;
-            gap: 30px;
-            position: relative;
-            z-index: 10;
         }
 
+        /* Piles */
         .pile-wrapper {
-            position: relative;
             width: var(--card-w-desktop);
             height: var(--card-h-desktop);
+            position: relative;
         }
 
-        /* Draw Pile */
         .draw-pile {
             width: 100%;
             height: 100%;
             background: #2f3542;
-            border-radius: 15px;
+            border-radius: 12px;
             border: 4px solid #f1f2f6;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
@@ -289,81 +326,65 @@
             transform: scale(0.95);
         }
 
-        /* Uno Logo on Deck */
         .uno-logo-text {
             font-family: 'Fredoka One';
-            font-size: 30px;
+            font-size: 28px;
             color: rgba(255, 255, 255, 0.15);
             transform: rotate(-25deg);
         }
 
-        /* Discard Pile */
+        /* Discard */
         .discard-pile {
             width: 100%;
             height: 100%;
-            transform: rotate(5deg);
+            transform: rotate(0deg);
+            /* Reset tilt for alignment */
         }
 
-        /* Active Color Indicator */
-        .active-color-badge {
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 5px 15px;
-            border-radius: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            border: 2px solid white;
-            display: none;
-            /* JS toggles */
-            white-space: nowrap;
+        /* 3. Bottom Hand & Actions */
+        .bottom-section {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
-        /* 4. Action Buttons (Right Side) */
-        .action-area {
+        /* Action Buttons: Anchored Bottom Right */
+        .action-anchor {
             position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
+            bottom: 180px;
+            /* Just above hand */
+            right: 40px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             z-index: 50;
+            align-items: center;
         }
 
-        /* ROUND BUTTONS - STRICT STATES */
         .btn-round {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 900;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 4px solid rgba(255, 255, 255, 0.5);
+            border: 4px solid rgba(255, 255, 255, 0.3);
             color: white;
             cursor: pointer;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-            /* INACTIVE STATE (Default) */
+            transition: 0.3s;
             background: #57606f;
             opacity: 0.5;
             filter: grayscale(100%);
-            transform: scale(0.8);
+            transform: scale(0.9);
             pointer-events: none;
-            box-shadow: none;
         }
 
-        /* ACTION NEEDED */
         .btn-round.btn-action-needed {
-            /* ACTIVE STATE */
             opacity: 1;
             filter: grayscale(0%);
-            transform: scale(1.1);
+            transform: scale(1.05);
             pointer-events: auto;
             border-color: white;
             animation: pulse-btn 1.5s infinite;
@@ -381,50 +402,44 @@
 
         @keyframes pulse-btn {
             0% {
-                transform: scale(1.1);
+                transform: scale(1.05);
             }
 
             50% {
-                transform: scale(1.15);
-                box-shadow: 0 0 30px white;
+                transform: scale(1.1);
+                box-shadow: 0 0 25px white;
             }
 
             100% {
-                transform: scale(1.1);
+                transform: scale(1.05);
             }
         }
 
 
-        /* 5. Footer: Hand */
-        .bottom-bar {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            /* Generally center cards */
-            padding-bottom: 20px;
-            height: 100%;
+        /* Player Hand: Centered */
+        .hand-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            /* Center horizontally */
         }
 
-        .hand-scroll-wrapper {
-            width: 100%;
-            overflow-x: auto;
+        .hand-scroll {
             display: flex;
-            justify-content: center;
-            padding: 10px;
+            overflow-x: auto;
+            padding: 20px 40px;
+            gap: 10px;
+            max-width: 100%;
+            /* Hide scrollbar */
             scrollbar-width: none;
         }
 
-        .hand-scroll-wrapper::-webkit-scrollbar {
+        .hand-scroll::-webkit-scrollbar {
             display: none;
-        }
-
-        .hand-inner {
-            display: flex;
-            align-items: flex-end;
-            gap: 12px;
-            /* Nice tangential gap */
-            padding: 0 30px;
         }
 
         /* --- CARD STYLING --- */
@@ -439,23 +454,18 @@
             flex-shrink: 0;
             user-select: none;
             transition: transform 0.2s;
-            border: 5px solid white;
-            /* Crisp white border like reference */
+            border: 4px solid white;
         }
 
         .card:hover {
-            transform: translateY(-30px) scale(1.05);
+            transform: translateY(-30px);
             z-index: 100;
-        }
-
-        .card:active {
-            transform: translateY(-20px) scale(1.0);
         }
 
         .card-inner {
             width: 100%;
             height: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -479,11 +489,9 @@
         }
 
         .bg-black {
-            background: #2d3436;
             background: radial-gradient(circle, #555 10%, #000 90%);
         }
 
-        /* Center White Oval */
         .card-oval {
             width: 80%;
             height: 75%;
@@ -500,7 +508,7 @@
             font-family: 'Fredoka One';
             font-size: 50px;
             line-height: 1;
-            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
         }
 
         .bg-red .card-val-big {
@@ -520,7 +528,7 @@
         }
 
         .bg-black .card-val-big {
-            background: linear-gradient(to right, var(--red), var(--blue-real), var(--green), var(--yellow));
+            background: linear-gradient(to right, #ff4757, #3742fa, #2ecc71, #ffa502);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -545,7 +553,7 @@
             transform: rotate(180deg);
         }
 
-        /* --- MOBILE ADJUSTMENTS --- */
+        /* --- MOBILE --- */
         @media (max-width: 600px) {
             :root {
                 --card-w-desktop: 80px;
@@ -553,23 +561,12 @@
             }
 
             #game-layout {
-                grid-template-rows: 80px 1fr 160px;
+                grid-template-rows: 90px 1fr 180px;
             }
 
-            #statusText {
-                font-size: 24px;
-                top: 20%;
-            }
-
-            .action-area {
-                flex-direction: row;
-                top: auto;
-                bottom: 180px;
-                right: 50%;
-                transform: translateX(50%);
-                width: 100%;
-                justify-content: center;
-                gap: 40px;
+            .action-anchor {
+                bottom: 140px;
+                right: 20px;
             }
 
             .btn-round {
@@ -587,18 +584,9 @@
             .card:hover {
                 transform: translateY(-15px);
             }
-
-            /* Force left align scrolling on mobile if overflowing */
-            .hand-scroll-wrapper {
-                justify-content: flex-start;
-            }
-
-            .hand-inner {
-                padding: 0 20px;
-            }
         }
 
-        /* --- MENUS (LOBBY) --- */
+        /* --- MENUS --- */
         .color-highlight {
             color: var(--yellow);
             text-shadow: 0 0 10px var(--yellow);
@@ -644,13 +632,9 @@
                     style="font-size:36px; letter-spacing:4px; font-weight:bold;">---</div>
                 <div style="font-size:10px; opacity:0.4;">Tap to Copy</div>
             </div>
-
             <div id="lobbyList" style="text-align:left; margin-bottom:20px;"></div>
-
-            <div id="hostArea" style="display:none;">
-                <button onclick="startGame()">START GAME</button>
-            </div>
-            <p id="waitText" style="opacity:0.6">Waiting for host to start...</p>
+            <div id="hostArea" style="display:none;"> <button onclick="startGame()">START GAME</button> </div>
+            <p id="waitText" style="opacity:0.6">Waiting for host...</p>
         </div>
     </div>
 
@@ -658,43 +642,48 @@
     <div id="screen-game" class="screen">
         <div id="game-layout">
 
-            <!-- TOP: Opponents -->
+            <!-- 1. Opponents (Top) -->
             <div class="top-bar" id="opponentsBar"></div>
 
-            <!-- OVERLAY: Status -->
-            <div class="status-overlay">
-                <div id="statusText"></div>
-                <div id="activeColorBadge" class="active-color-badge">Color: RED</div>
-            </div>
+            <!-- 2. Center: Status Pill + Board -->
+            <div class="center-section">
+                <!-- Status Pill -->
+                <div class="status-pill">
+                    <div id="statusText">Connecting...</div>
+                    <div id="activeColorBadge" class="active-color-badge"></div>
+                </div>
 
-            <!-- CENTER: Board -->
-            <div class="center-board">
-                <div class="pile-wrapper" onclick="drawCard()">
-                    <div class="draw-pile">
-                        <div class="uno-logo-text">UNO</div>
+                <!-- Deck + Discard -->
+                <div class="card-board">
+                    <div class="pile-wrapper" onclick="drawCard()">
+                        <div class="draw-pile">
+                            <div class="uno-logo-text">UNO</div>
+                        </div>
+                    </div>
+                    <div class="pile-wrapper">
+                        <div class="discard-pile" id="discardPile"></div>
                     </div>
                 </div>
-                <div class="pile-wrapper">
-                    <div class="discard-pile" id="discardPile"></div>
+            </div>
+
+            <!-- 3. Bottom Hand area & Actions -->
+            <div class="bottom-section">
+                <!-- Action Buttons: Anchored Right -->
+                <div class="action-anchor">
+                    <div id="btnUno" class="btn-round" onclick="sayUno()">UNO!</div>
+                    <div id="btnCatch" class="btn-round" onclick="catchUno()">CATCH</div>
+                </div>
+
+                <!-- Hand: Centered -->
+                <div class="hand-container">
+                    <div class="hand-scroll" id="myHand"></div>
                 </div>
             </div>
 
-            <!-- RIGHT/BOTTOM: Actions -->
-            <div class="action-area">
-                <div id="btnUno" class="btn-round" onclick="sayUno()">UNO!</div>
-                <div id="btnCatch" class="btn-round" onclick="catchUno()">CATCH</div>
-            </div>
-
-            <!-- BOTTOM: Hand -->
-            <div class="bottom-bar">
-                <div class="hand-scroll-wrapper">
-                    <div class="hand-inner" id="myHand"></div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- MODAL: Color Picker -->
+    <!-- MODALS (Color, Challenge, Draw, Victory) -->
     <div id="modalColor" class="screen" style="position:fixed; background:rgba(0,0,0,0.85); z-index:2000;">
         <h2 style="margin-bottom:30px;">Choose a Color</h2>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -712,37 +701,22 @@
             </div>
         </div>
     </div>
-
-    <!-- MODAL: Challenge -->
     <div id="modalChallenge" class="screen" style="position:fixed; background:rgba(0,0,0,0.9); z-index:2000;">
         <h1 style="color:var(--red); font-size:40px;">WILD +4!</h1>
         <p>You have been attacked.</p>
-        <p style="opacity:0.7; font-size:14px; max-width:300px; text-align:center; margin-bottom:30px;">
-            If the attacker has the matching color in their hand, you can WIN a challenge (they draw 4).
-            If you lose, you draw 6.
-        </p>
-        <div style="display:flex; gap:20px;">
-            <button onclick="doChallenge(true)" style="background:var(--red);">CHALLENGE</button>
-            <button class="btn-secondary" onclick="doChallenge(false)">ACCEPT (+4)</button>
-        </div>
+        <button onclick="doChallenge(true)" style="background:var(--red); margin:10px;">CHALLENGE</button>
+        <button class="btn-secondary" onclick="doChallenge(false)">ACCEPT (+4)</button>
     </div>
-
-    <!-- MODAL: Draw Choice -->
     <div id="modalDraw" class="screen" style="position:fixed; background:rgba(0,0,0,0.85); z-index:2000;">
         <h2>Playable Card!</h2>
         <div id="drawReviewContainer" style="margin:30px; pointer-events:none;"></div>
-        <div style="display:flex; gap:20px;">
-            <button onclick="doDrawAction(true)">PLAY</button>
-            <button class="btn-secondary" onclick="doDrawAction(false)">KEEP</button>
-        </div>
+        <button onclick="doDrawAction(true)" style="margin:10px;">PLAY</button>
+        <button class="btn-secondary" onclick="doDrawAction(false)">KEEP</button>
     </div>
-
-    <!-- MODAL: Victory -->
     <div id="modalVictory" class="screen" style="position:fixed; background:rgba(0,0,0,0.95); z-index:3000;">
         <h1 style="font-size:60px; color:var(--yellow);">VICTORY!</h1>
         <h2 id="winnerText"></h2>
-        <br><br>
-        <button onclick="location.reload()">PLAY AGAIN</button>
+        <br><button onclick="location.reload()">PLAY AGAIN</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -754,262 +728,131 @@
 
         // UI Helpers
         function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => {
-                if (!s.id.startsWith('modal')) s.classList.remove('active-screen');
-            });
+            document.querySelectorAll('.screen').forEach(s => { if (!s.id.startsWith('modal')) s.classList.remove('active-screen'); });
             if (!id.startsWith('modal')) hideModals();
             document.getElementById(id).classList.add('active-screen');
         }
         function hideModals() {
-            document.getElementById('modalColor').classList.remove('active-screen');
-            document.getElementById('modalChallenge').classList.remove('active-screen');
-            document.getElementById('modalDraw').classList.remove('active-screen');
-            document.getElementById('modalVictory').classList.remove('active-screen');
+            ['modalColor', 'modalChallenge', 'modalDraw', 'modalVictory'].forEach(id => document.getElementById(id).classList.remove('active-screen'));
         }
         function toast(msg) {
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = 'toast'; t.innerText = msg;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 2500);
+            c.appendChild(t); setTimeout(() => t.remove(), 2500);
         }
-        function copyCode() {
-            navigator.clipboard.writeText(roomCodeVal).then(() => toast("Code Copied!"));
-        }
+        function copyCode() { navigator.clipboard.writeText(roomCodeVal).then(() => toast("Code Copied!")); }
 
         // Logic
         socket.on('connect', () => myId = socket.id);
-
-        socket.on('gameCreated', d => {
-            roomCodeVal = d.roomCode;
-            document.getElementById('lobbyCodeDisplay').innerText = d.roomCode;
-            document.getElementById('hostArea').style.display = 'block';
-            document.getElementById('waitText').style.display = 'none';
-            showScreen('screen-lobby');
-        });
-
-        socket.on('joinedGame', d => {
-            roomCodeVal = d.roomCode;
-            document.getElementById('lobbyCodeDisplay').innerText = d.roomCode;
-            document.getElementById('hostArea').style.display = 'none';
-            document.getElementById('waitText').style.display = 'block';
-            showScreen('screen-lobby');
-        });
-
-        socket.on('playerList', list => {
-            const c = document.getElementById('lobbyList');
-            c.innerHTML = list.map(p => `<div style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.1);">${p.name}</div>`).join('');
-        });
-
-        socket.on('gameStarted', state => {
-            showScreen('screen-game');
-            updateBoard(state);
-        });
+        socket.on('gameCreated', d => { roomCodeVal = d.roomCode; document.getElementById('lobbyCodeDisplay').innerText = d.roomCode; document.getElementById('hostArea').style.display = 'block'; document.getElementById('waitText').style.display = 'none'; showScreen('screen-lobby'); });
+        socket.on('joinedGame', d => { roomCodeVal = d.roomCode; document.getElementById('lobbyCodeDisplay').innerText = d.roomCode; document.getElementById('hostArea').style.display = 'none'; document.getElementById('waitText').style.display = 'block'; showScreen('screen-lobby'); });
+        socket.on('playerList', list => { document.getElementById('lobbyList').innerHTML = list.map(p => `<div style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.1);">${p.name}</div>`).join(''); });
+        socket.on('gameStarted', state => { showScreen('screen-game'); updateBoard(state); });
         socket.on('gameState', updateBoard);
-
-        socket.on('handUpdate', h => {
-            myHand = h;
-            renderHand();
-            checkUnoButton();
-        });
-
+        socket.on('handUpdate', h => { myHand = h; renderHand(); checkUnoButton(); });
         socket.on('actionLog', d => toast(d.msg));
         socket.on('errorMsg', m => alert(m));
-
-        socket.on('challengePrompt', d => {
-            showScreen('modalChallenge');
-        });
-
+        socket.on('challengePrompt', () => showScreen('modalChallenge'));
         socket.on('drawChoice', d => {
-            const c = document.getElementById('drawReviewContainer');
-            c.innerHTML = '';
-            c.appendChild(createCard(d.card));
-            showScreen('modalDraw');
+            const c = document.getElementById('drawReviewContainer'); c.innerHTML = ''; c.appendChild(createCard(d.card)); showScreen('modalDraw');
         });
+        socket.on('gameOver', d => { document.getElementById('winnerText').innerText = d.winner; showScreen('modalVictory'); });
 
-        socket.on('gameOver', d => {
-            document.getElementById('winnerText').innerText = d.winner;
-            showScreen('modalVictory');
-        });
-
-        // --- Interaction ---
-        function createGame() {
-            const n = document.getElementById('username').value;
-            if (n) socket.emit('createGame', { paramName: n });
-            else alert("Enter Name");
-        }
-        function joinGame() {
-            const n = document.getElementById('username').value;
-            const c = document.getElementById('roomCode').value;
-            if (n && c) socket.emit('joinGame', { paramName: n, roomCode: c });
-            else alert("Enter details");
-        }
+        // Interactions
+        function createGame() { const n = document.getElementById('username').value; if (n) socket.emit('createGame', { paramName: n }); }
+        function joinGame() { const n = document.getElementById('username').value; const c = document.getElementById('roomCode').value; if (n && c) socket.emit('joinGame', { paramName: n, roomCode: c }); }
         function startGame() { socket.emit('startGame'); }
-
         function drawCard() { socket.emit('drawCard'); }
-        function sayUno() {
-            socket.emit('sayUno');
-            document.getElementById('btnUno').classList.remove('btn-action-needed');
-        }
+        function sayUno() { socket.emit('sayUno'); document.getElementById('btnUno').classList.remove('btn-action-needed'); }
         function catchUno() { socket.emit('catchUno'); }
 
-        // Card Play
-        let tempCardIdx = null;
-        let isDrawPlay = false;
-
+        let tempCardIdx = null; let isDrawPlay = false;
         function clickCard(idx) {
             const c = myHand[idx];
-            if (c.color === 'black') {
-                tempCardIdx = idx;
-                isDrawPlay = false;
-                showScreen('modalColor');
-            } else {
-                socket.emit('playCard', { cardIndex: idx });
-            }
+            if (c.color === 'black') { tempCardIdx = idx; isDrawPlay = false; showScreen('modalColor'); }
+            else { socket.emit('playCard', { cardIndex: idx }); }
         }
-
         function doPickColor(col) {
             hideModals();
-            if (isDrawPlay) {
-                socket.emit('finishDrawTurn', { play: true, chosenColor: col });
-            } else if (tempCardIdx !== null) {
-                socket.emit('playCard', { cardIndex: tempCardIdx, chosenColor: col });
-            }
+            if (isDrawPlay) socket.emit('finishDrawTurn', { play: true, chosenColor: col });
+            else if (tempCardIdx !== null) socket.emit('playCard', { cardIndex: tempCardIdx, chosenColor: col });
         }
-
         function doDrawAction(play) {
             hideModals();
             if (play) {
                 const el = document.getElementById('drawReviewContainer').firstElementChild;
-                if (el && el.innerHTML.includes('bg-black')) {
-                    isDrawPlay = true;
-                    showScreen('modalColor');
-                    return;
-                }
+                if (el && el.innerHTML.includes('bg-black')) { isDrawPlay = true; showScreen('modalColor'); return; }
                 socket.emit('finishDrawTurn', { play: true });
-            } else {
-                socket.emit('finishDrawTurn', { play: false });
-            }
+            } else socket.emit('finishDrawTurn', { play: false });
         }
+        function doChallenge(doC) { hideModals(); socket.emit('respondChallenge', { challenge: doC }); }
 
-        function doChallenge(doC) {
-            hideModals();
-            socket.emit('respondChallenge', { challenge: doC });
-        }
-
-
-        // --- Render ---
+        // Render
         function updateBoard(state) {
             if (!state.roomCode) return;
-
-            // 1. Status
+            // 1. Status Pill
             const isMe = state.currentPlayer === myId;
             const turnP = state.players.find(p => p.id === state.currentPlayer);
-            const statusD = document.getElementById('statusText');
-            if (isMe) {
-                statusD.innerText = "YOUR TURN";
-                statusD.style.color = "#2ecc71";
-            } else {
-                statusD.innerText = (turnP ? turnP.name : 'Opponent') + "'s Turn";
-                statusD.style.color = "white";
-            }
+            const statusTv = document.getElementById('statusText');
+            if (isMe) { statusTv.innerText = "YOUR TURN"; statusTv.style.color = "#2ecc71"; }
+            else { statusTv.innerText = (turnP ? turnP.name : 'Opponent') + "'s Turn"; statusTv.style.color = "white"; }
+
+            // Badge
+            const badge = document.getElementById('activeColorBadge');
+            if (state.activeColor) {
+                badge.style.display = 'block'; badge.innerText = "Color: " + state.activeColor;
+                let hex = { red: '#ff4757', blue: '#3742fa', green: '#2ecc71', yellow: '#ffa502' }[state.activeColor];
+                badge.style.backgroundColor = hex;
+            } else badge.style.display = 'none';
 
             // 2. Opponents
-            const topBar = document.getElementById('opponentsBar');
-            topBar.innerHTML = '';
+            const topBar = document.getElementById('opponentsBar'); topBar.innerHTML = '';
             state.players.forEach(p => {
                 if (p.id === myId) return;
-                const d = document.createElement('div');
-                d.className = `opponent ${p.isTurn ? 'active-turn' : ''}`;
-
+                const d = document.createElement('div'); d.className = `opponent ${p.isTurn ? 'active-turn' : ''}`;
                 let icon = p.name.substring(0, 2).toUpperCase();
                 d.innerHTML = `
-                   <div class="opponent-avatar">${icon}</div>
-                   <div class="opponent-card-count">${p.cardCount}</div>
-                   ${p.saidUno ? '<div style="color:yellow; font-weight:bold; font-size:10px; margin-top:2px;">UNO!</div>' : ''}
-                   <div class="opponent-name">${p.name}</div>
+                    <div class="opponent-avatar">
+                        ${icon}
+                        <div class="opponent-card-count">${p.cardCount}</div>
+                    </div>
+                    <div class="opponent-name">${p.name}</div>
+                    ${p.saidUno ? '<div style="color:yellow; font-weight:bold; font-size:10px; margin-top:2px;">UNO!</div>' : ''}
                 `;
                 topBar.appendChild(d);
             });
 
             // 3. Discard
-            const dis = document.getElementById('discardPile');
-            dis.innerHTML = '';
-            if (state.topCard) {
-                const c = createCard(state.topCard);
-                dis.appendChild(c);
-            }
+            const dis = document.getElementById('discardPile'); dis.innerHTML = '';
+            if (state.topCard) dis.appendChild(createCard(state.topCard));
 
-            // 4. Color Indicator
-            const badge = document.getElementById('activeColorBadge');
-            if (state.activeColor) {
-                badge.style.display = 'block';
-                badge.innerText = "Color: " + state.activeColor.toUpperCase();
-                let hex = { red: '#ff4757', blue: '#3742fa', green: '#2ecc71', yellow: '#ffa502' }[state.activeColor];
-                badge.style.backgroundColor = hex;
-            } else {
-                badge.style.display = 'none';
-            }
-
-            // 5. Catch Button
-            let canCatch = false;
-            state.players.forEach(p => {
-                if (p.id !== myId && p.cardCount === 1 && !p.saidUno) canCatch = true;
-            });
+            // 4. Buttons
+            let canCatch = false; state.players.forEach(p => { if (p.id !== myId && p.cardCount === 1 && !p.saidUno) canCatch = true; });
             updateButtonState('btnCatch', canCatch);
         }
 
         function renderHand() {
-            const c = document.getElementById('myHand');
-            c.innerHTML = '';
+            const c = document.getElementById('myHand'); c.innerHTML = '';
             myHand.forEach((card, i) => {
-                const el = createCard(card);
-                el.onclick = () => clickCard(i);
-                c.appendChild(el);
+                const el = createCard(card); el.onclick = () => clickCard(i); c.appendChild(el);
             });
         }
 
-        function checkUnoButton() {
-            let active = myHand.length > 0 && myHand.length <= 2;
-            updateButtonState('btnUno', active);
-        }
-
-        function updateButtonState(id, isActive) {
+        function checkUnoButton() { updateButtonState('btnUno', myHand.length > 0 && myHand.length <= 2); }
+        function updateButtonState(id, active) {
             const el = document.getElementById(id);
-            if (isActive) el.classList.add('btn-action-needed');
-            else el.classList.remove('btn-action-needed');
+            if (active) el.classList.add('btn-action-needed'); else el.classList.remove('btn-action-needed');
         }
 
         function createCard(data) {
             const d = document.createElement('div');
-            // define background
-            let bgClass = 'bg-black';
-            if (data.color === 'red') bgClass = 'bg-red';
-            if (data.color === 'blue') bgClass = 'bg-blue';
-            if (data.color === 'green') bgClass = 'bg-green';
-            if (data.color === 'yellow') bgClass = 'bg-yellow';
-
-            // define symbol
-            let sym = data.value;
-            if (sym === 'skip') sym = '⊘';
-            if (sym === 'reverse') sym = '⇄';
-            if (sym === 'draw2') sym = '+2';
-            if (sym === 'wild') sym = 'W';
-            if (sym === 'wild_draw4') sym = '+4';
-
+            let bg = 'bg-black'; if (data.color === 'red') bg = 'bg-red'; if (data.color === 'blue') bg = 'bg-blue'; if (data.color === 'green') bg = 'bg-green'; if (data.color === 'yellow') bg = 'bg-yellow';
+            let sym = data.value; if (sym === 'skip') sym = '⊘'; if (sym === 'reverse') sym = '⇄'; if (sym === 'draw2') sym = '+2'; if (sym === 'wild') sym = 'W'; if (sym === 'wild_draw4') sym = '+4';
             d.className = 'card';
-            d.innerHTML = `
-                <div class="card-inner ${bgClass}">
-                     <div class="corner-val c-tl">${sym}</div>
-                     <div class="card-oval">
-                         <div class="card-val-big">${sym}</div>
-                     </div>
-                     <div class="corner-val c-br">${sym}</div>
-                </div>
-            `;
+            d.innerHTML = `<div class="card-inner ${bg}"><div class="corner-val c-tl">${sym}</div><div class="card-oval"><div class="card-val-big">${sym}</div></div><div class="corner-val c-br">${sym}</div></div>`;
             return d;
         }
-
     </script>
 </body>
 
